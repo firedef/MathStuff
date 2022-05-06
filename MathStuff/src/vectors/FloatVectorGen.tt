@@ -2,12 +2,8 @@
 <#@ assembly name="System.Core"#>
 <#@ import namespace="System.Linq" #>
 <#
-    char[] axisNames = {
-        'x', 'y', 'z', 'w'
-    };
-    int[] axisCount = {
-        2, 3, 4
-    };
+    char[] axisNames = {'x', 'y', 'z', 'w'};
+    int[] axisCount = {2, 3, 4};
     int runCount = axisCount.Length;
 #>
 /* GENERATED USING T4 */
@@ -118,9 +114,7 @@ public struct <#= vecName #> {
 #region operators
 
 <#
-        string[] binaryOperators = {
-            "+", "-", "*", "/"
-        };
+        string[] binaryOperators = {"+", "-", "*", "/"};
         foreach (string op in binaryOperators) {
 #>
     // binary operator '<#= op #>'
@@ -196,22 +190,32 @@ public struct <#= vecName #> {
 <#
         switch (aCount) {
             case 2:{
+                // float2: 
 #>
     public static float2 SinCos(float radians, float length) => new(MathF.Sin(radians) * length, MathF.Cos(radians) * length);
+    public static float2 SinCos(float radians) => new(MathF.Sin(radians), MathF.Cos(radians));
 <#
                 break;
             }
             case 3:{
+                // float3:
 #>
     public static implicit operator <#= vecName #>(color v) => new(v.rF, v.gF, v.bF);
     public static implicit operator color(<#= vecName #> v) => new(v.x, v.y, v.z);
+
+    public static float3 SinCos(float radians, float length) => new(MathF.Sin(radians) * length, MathF.Cos(radians) * length);
+    public static float3 SinCos(float radians) => new(MathF.Sin(radians), MathF.Cos(radians));
 
     public static float3 Cross(float3 a, float3 b) => new(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 <#
                 break;
             }
             case 4:{
+                // float4:
 #>
+    public static float4 SinCos(float radians, float length) => new(MathF.Sin(radians) * length, MathF.Cos(radians) * length);
+    public static float4 SinCos(float radians) => new(MathF.Sin(radians), MathF.Cos(radians));
+
     public static implicit operator <#= vecName #>(color v) => new(v.rF, v.gF, v.bF, v.aF);
     public static implicit operator color(<#= vecName #> v) => new(v.x, v.y, v.z, v.w);
 <#

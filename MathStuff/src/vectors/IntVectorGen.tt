@@ -1,0 +1,204 @@
+<#@ template language="C#v3.5" #>
+<#@ assembly name="System.Core"#>
+<#@ import namespace="System.Linq" #>
+/* GENERATED USING T4 */
+
+// ReSharper disable IdentifierTypo
+namespace MathStuff.vectors;
+
+<#
+    char[] axisNames = {'x', 'y', 'z', 'w'};
+    int[] axisCount = {2, 3, 4};
+    int runCount = axisCount.Length;
+    
+    string[] binaryOperators = {"+", "-", "*", "/"};
+    (string s, string concatOp)[] eqOperators = {
+        ("==", "&&"),
+        ("!=", "||"),
+        (">", "&&"),
+        (">=", "&&"),
+        ("<", "&&"),
+        ("<=", "&&")
+    };
+
+    for (int iter = 0; iter < runCount; iter++) {
+        string vecName = $"int{axisCount[iter]}";
+        string floatVecName = $"float{axisCount[iter]}";
+        int aCount = axisCount[iter];
+        char[] curAxis = axisNames.Take(aCount).ToArray();
+#>
+public struct <#=vecName#> {
+#region staticFields
+
+    <#= GenReadonly_("zero", "new(0)", 2) #>
+    <#= GenReadonly_("one", "new(1)", 2) #>
+    <#= GenReadonly_("maxValue", "new(int.MaxValue)", 2) #>
+    <#= GenReadonly_("minValue", "new(int.MinValue)", 2) #>
+    <#= GenReadonly_("up", "new(0,1)", 2) #>
+    <#= GenReadonly_("down", "new(0,-1)", 2) #>
+    <#= GenReadonly_("right", "new(1,0)", 2) #>
+    <#= GenReadonly_("left", "new(-1,0)", 2) #>
+    <#= GenReadonly_("front", "new(0,0,1)", 3) #>
+    <#= GenReadonly_("back", "new(0,0,-1)", 3) #>
+
+#endregion staticFields
+
+#region axis
+<#= GenAxis_("int")#>
+#endregion axis
+
+#region constructors
+    
+<#=GenCtors_()#>
+
+#endregion constructors
+
+#region functions
+
+    public float lengthSq => <#= string.Join(" + ", curAxis.Select(v => $"(float){v}*{v}")) #>;
+    public float length => math.sqrt(lengthSq);
+
+    public int sum => <#= string.Join(" + ", curAxis) #>;
+    public int mul => <#= string.Join(" * ", curAxis) #>;
+    public float avg => sum * <#= 1f / aCount #>f;
+    public int min => math.min(<#= string.Join(", ", curAxis) #>);
+    public int max => math.max(<#= string.Join(", ", curAxis) #>);
+
+    public float<#= aCount #> normalized { get { float len = 1 / length; return this * len; } }
+
+    public float<#= aCount #> WithLength(float l) { float len = l / length; return this * len; }
+
+<#
+        for (int i = 0; i < aCount; i++) {
+            char axis0 = axisNames[i];
+#>
+    public void Flip<#= axis0.ToString().ToUpper() #>() => <#= axis0 #> = -<#= axis0 #>;
+<#
+        }
+#>
+
+#endregion functions
+
+#region operators
+
+    // binary operators 
+<#= GenBinaryOperators_()#>
+
+    // equality operators
+<#= GenEqualityOperators_()#>
+
+    // other operators
+    public static <#= vecName #> operator -(<#= vecName #> a) => new(<#= string.Join(", ", curAxis.Select(v => $"-a.{v}")) #>);
+    public static implicit operator <#= vecName #>(int v) => new(v);
+    public static explicit operator <#= vecName #>(float v) => new((int) v);
+
+<#
+        for (int i = 1; i < aCount - 1; i++) {
+            string vecName2 = $"int{i + 1}";
+#>
+    public <#= vecName #>(<#= vecName2 #> a, <#= string.Join(", ", curAxis.Skip(i + 1).Select(v => $"int {v}")) #>) {
+<#= string.Join("", curAxis.Take(i + 1).Select(v => $"        {v} = a.{v};\n")) #>
+<#= string.Join("", curAxis.Skip(i + 1).Select(v => $"        this.{v} = {v};\n")) #>    }
+
+    public static implicit operator <#= vecName2 #>(<#= vecName #> v) => v.<#= string.Join("", curAxis.Take(i + 1).Select(v => $"{v}")) #>;
+    public static implicit operator <#= vecName #>(<#= vecName2 #> v) => new(<#= string.Join(", ", curAxis.Take(i + 1).Select(v => $"v.{v}")) #><#= string.Concat(Enumerable.Repeat(", 0", aCount - i - 1)) #>);
+<#
+        }
+#>
+
+#endregion operators
+
+#region staticFunc
+
+    public static <#= vecName #> Min(<#= vecName #> a, <#= vecName #> b) => new(<#= string.Join(", ", curAxis.Select(v => $"math.min(a.{v}, b.{v})")) #>);
+    public static <#= vecName #> Min(<#= vecName #> a, <#= vecName #> b, <#= vecName #> c) => new(<#= string.Join(", ", curAxis.Select(v => $"math.min(a.{v}, b.{v}, c.{v})")) #>);
+    public static <#= vecName #> Min(<#= vecName #> a, <#= vecName #> b, <#= vecName #> c, <#= vecName #> d) => new(<#= string.Join(", ", curAxis.Select(v => $"math.min(a.{v}, b.{v}, c.{v}, d.{v})")) #>);
+
+    public static <#= vecName #> Max(<#= vecName #> a, <#= vecName #> b) => new(<#= string.Join(", ", curAxis.Select(v => $"math.max(a.{v}, b.{v})")) #>);
+    public static <#= vecName #> Max(<#= vecName #> a, <#= vecName #> b, <#= vecName #> c) => new(<#= string.Join(", ", curAxis.Select(v => $"math.max(a.{v}, b.{v}, c.{v})")) #>);
+    public static <#= vecName #> Max(<#= vecName #> a, <#= vecName #> b, <#= vecName #> c, <#= vecName #> d) => new(<#= string.Join(", ", curAxis.Select(v => $"math.max(a.{v}, b.{v}, c.{v}, d.{v})")) #>);
+
+    public static <#= vecName #> Clamp(<#= vecName #> v, <#= vecName #> min, <#= vecName #> max) => Max(Min(v, max), min);
+
+#endregion staticFunc
+
+#region impl
+
+    public bool Equals(<#= vecName #> other) => <#= string.Join(" && ", curAxis.Select(v => $"{v} == other.{v}")) #>;
+	public override bool Equals(object? obj) => obj is <#= vecName #> other && Equals(other);
+	public override int GetHashCode() => HashCode.Combine(<#= string.Join(", ", curAxis) #>);
+
+	public override string ToString() => $"(<#= string.Join(",", curAxis.Select(v => $"{{{v}}}")) #>)";
+
+#endregion impl
+
+#region other
+
+    public static float Dot(<#= vecName #> a, <#= vecName #> b) => <#= string.Join(" + ", curAxis.Select(v => $"(float)a.{v} * b.{v}")) #>;
+
+#endregion other
+
+}
+
+<#
+        string GenReadonly_(string name, string val, int minAxisCount) => aCount >= minAxisCount ? $"public static readonly {vecName} {name} = {val};" : "";
+
+        string GenAxis_(string name, int indent = 1) {
+            string str = "";
+
+            for (int i = 0; i < aCount; i++) {
+                char axis0 = axisNames[i];
+                str += $"\n{Indent_(indent)}// {axis0} axis\n";
+                str += $"{Indent_(indent)}public {name} {axis0};\n";
+                
+                for (int j = 0; j < aCount; j++) {
+                    char axis1 = axisNames[j];
+                    str += $"{Indent_(indent)}public {name}2 {axis0}{axis1} => new({axis0}, {axis1});\n";
+                
+                    for (int k = 0; k < aCount; k++) {
+                        char axis2 = axisNames[k];
+                        str += $"{Indent_(indent)}public {name}3 {axis0}{axis1}{axis2} => new({axis0}, {axis1}, {axis2});\n";
+                    
+                        for (int l = 0; l < aCount; l++) {
+                            char axis3 = axisNames[l];
+                            str += $"{Indent_(indent)}public {name}4 {axis0}{axis1}{axis2}{axis3} => new({axis0}, {axis1}, {axis2}, {axis3});\n";
+                        }
+                    }
+                }
+            }
+
+            return str;
+        }
+
+        string GenCtors_() {
+            string str = $"{Indent_(1)}public {vecName}({string.Join(", ", axisNames.Take(aCount).Select(v => $"int {v} = 0"))}) {{\n";
+            str += $"{Indent_(2)}{string.Join($"\n{Indent_(2)}", axisNames.Take(aCount).Select(v => $"this.{v} = {v};"))}\n";
+            str += $"{Indent_(1)}}}\n\n";
+
+            str += $"{Indent_(1)}public {vecName}(int v) => {string.Join(" = ", axisNames.Take(aCount))} = v;";
+            return str;
+        }
+
+        string GenBinaryOperators_() => string.Join("", binaryOperators.Select(v => GenOperator_(v)));
+        string GenEqualityOperators_() => string.Join("", eqOperators.Select(v => GenOperator_(v.s, $" {v.concatOp} ", "", "", "bool", 
+                                                                                               v.s switch {
+                                                                                                   "==" => (a, _) => $"math.abs(a.{a} - b.{a}) < .00001f",
+                                                                                                   "!=" => (a, _) => $"math.abs(a.{a} - b.{a}) >= .00001f",
+                                                                                                   _ => null
+                                                                                                   })));
+
+        string GenOperator_(string op, string concatOp = ", ", string pre = "new(", string post = ")", string ret = null, Func<char, string, string> floatOp = null) {
+            string str = "";
+            str += $"{Indent_(1)}public static {ret ?? vecName} operator {op}({vecName} a, {vecName} b) => {pre}{string.Join(concatOp, curAxis.Select(v => $"a.{v} {op} b.{v}"))}{post};\n";
+            str += $"{Indent_(1)}public static {ret ?? vecName} operator {op}({vecName} a, int b) => {pre}{string.Join(concatOp, curAxis.Select(v => $"a.{v} {op} b"))}{post};\n";
+            str += $"{Indent_(1)}public static {ret ?? vecName} operator {op}(int a, {vecName} b) => {pre}{string.Join(concatOp, curAxis.Select(v => $"a {op} b.{v}"))}{post};\n";
+            
+            str += $"{Indent_(1)}public static {ret ?? floatVecName} operator {op}({vecName} a, {floatVecName} b) => {pre}{string.Join(concatOp, curAxis.Select(v => floatOp != null ? floatOp(v, op) : $"a.{v} {op} b.{v}"))}{post};\n";
+            str += $"{Indent_(1)}public static {ret ?? floatVecName} operator {op}({floatVecName} a, {vecName} b) => {pre}{string.Join(concatOp, curAxis.Select(v => floatOp != null ? floatOp(v, op) : $"a.{v} {op} b.{v}"))}{post};\n";
+            str += "\n";
+            return str;
+        }
+
+        string Indent_(int t) => new(' ', t * 4);
+    }
+#>

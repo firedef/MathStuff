@@ -24,17 +24,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="src\vectors\vectorGen.tt">
+        <None Update="src\vectors\FloatVectorGen.tt">
             <Generator>TextTemplatingFileGenerator</Generator>
-            <LastGenOutput>vectorGen.cs</LastGenOutput>
+            <LastGenOutput>FloatVectorGen.cs</LastGenOutput>
+        </None>
+        <None Update="src\vectors\IntVectorGen.tt">
+          <Generator>TextTemplatingFileGenerator</Generator>
+          <LastGenOutput>IntVectorGen.cs</LastGenOutput>
         </None>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Update="src\vectors\vectorGen.cs">
+        <Compile Update="src\vectors\FloatVectorGen.cs">
             <AutoGen>True</AutoGen>
             <DesignTime>True</DesignTime>
-            <DependentUpon>vectorGen.tt</DependentUpon>
+            <DependentUpon>FloatVectorGen.tt</DependentUpon>
+        </Compile>
+        <Compile Update="src\vectors\IntVectorGen.cs">
+          <AutoGen>True</AutoGen>
+          <DesignTime>True</DesignTime>
+          <DependentUpon>IntVectorGen.tt</DependentUpon>
         </Compile>
     </ItemGroup>
 
