@@ -1,4 +1,5 @@
 # MathStuff
+[![Nuget](https://img.shields.io/nuget/v/MathStuff?color=orange&style=flat-square)](https://www.nuget.org/packages/MathStuff/)<br/>
 Collection of some mathematic stuff i using
 
 # Vectors
