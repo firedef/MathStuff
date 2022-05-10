@@ -5,26 +5,6 @@ namespace MathStuff;
 public static partial class math {
 	public static int round(float v) => (int)v;
 
-	// public static int min(int a, int b) => a <= b ? a : b;
-	// public static int max(int a, int b) => a >= b ? a : b;
-	// public static int clamp(int v, int min_, int max_) => min(max_, max(v, min_));
-	//
-	// public static uint min(uint a, uint b) => a <= b ? a : b;
-	// public static uint max(uint a, uint b) => a >= b ? a : b;
-	// public static uint clamp(uint v, uint min_, uint max_) => min(max_, max(v, min_));
-	//
-	// public static long min(long a, long b) => a <= b ? a : b;
-	// public static long max(long a, long b) => a >= b ? a : b;
-	// public static long clamp(long v, long min_, long max_) => min(max_, max(v, min_));
-	//
-	// public static ulong min(ulong a, ulong b) => a <= b ? a : b;
-	// public static ulong max(ulong a, ulong b) => a >= b ? a : b;
-	// public static ulong clamp(ulong v, ulong min_, ulong max_) => min(max_, max(v, min_));
-	//
-	// public static float min(float a, float b) => a <= b ? a : b;
-	// public static float max(float a, float b) => a >= b ? a : b;
-	// public static float clamp(float v, float min_, float max_) => min(max_, max(v, min_));
-	//
 	public static int minFast_i16(int a, int b) => b + ((a - b) & ((a - b) >> 16));
 	public static int maxFast_i16(int a, int b) => a - ((a - b) & ((a - b) >> 16));
 	public static int clampFast_i16(int v, int min_, int max_) => minFast_i16(max_, maxFast_i16(v, min_));
