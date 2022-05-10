@@ -38,7 +38,7 @@ jobs:
       run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
       
     - name: Nuget push
-      run: dotnet nuget push MathStuff.${VERSION}.nupkg --Source https://api.nuget.org/v3/index.json --api-key ${NUGETAPIKEY}
+      run: dotnet nuget push MathStuff.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGETAPIKEY}
       env:
         NUGETAPIKEY: ${{ secrets.NUGETAPIKEY }}
       
