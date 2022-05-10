@@ -1,0 +1,44 @@
+name: Build and publish
+
+on:
+  push:
+    tags:
+    - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:      
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Verify commit exists in origin/master
+      run: |
+        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+        git branch --remote --contains | grep origin/master
+        
+    - name: Set version
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release /p:Version=${VERSION}
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --configuration Release /p:Version=${VERSION}
+      
+    - name: Pack
+      run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
+      
+    - name: Nuget push
+      run: dotnet nuget push MathStuff.${VERSION}.nupkg --source https://nuget.pkg.github.com/firedef/index.json --api-key ${NUGETAPIKEY}
+      env:
+        NUGETAPIKEY: ${{ secrets.NUGETAPIKEY }}
+      
