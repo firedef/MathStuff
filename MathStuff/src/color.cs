@@ -32,7 +32,6 @@ public struct color {
 
 	private const float _oneDiv255 = 1 / 255f;
 	public uint raw;
-
 	public color(uint raw) => this.raw = raw;
 
 	public color(byte r, byte g, byte b, byte a = 255) : this((uint)((a << 24) | (r << 16) | (g << 8) | b)) { }
