@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Title>Math Stuff</Title>
-        <Description>Collection of some mathematic stuff i using</Description>
+        <Description>Collection of some mathematic stuff i'm using</Description>
         <PackageLicenseUrl>https://licenses.nuget.org/MIT</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/firedef/MathStuff</RepositoryUrl>
         <PackageTags>mathematics, vectors</PackageTags>
